@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <cassert>
 #include <cstdint>
+#include <new>
 
 
 template <class T, std::size_t N>
@@ -36,7 +37,18 @@ public:
   }
 
 private:
+  void emplace_back(T element)
+  /**
+   * Create an object within aligned storage.
+   * @param element
+   */
+  {
+    if (member_size_ > N)
+      throw std::bad_alloc{};
 
+    new(data_ + member_size_) T(element);
+    ++member_size_;
+  }
 
 
 
