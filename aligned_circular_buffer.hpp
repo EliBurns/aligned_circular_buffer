@@ -40,7 +40,7 @@ private:
   void emplace_back(T element)
   /**
    * Create an object within aligned storage.
-   * @param element
+   * @param element Element to store of type T.
    */
   {
     if (member_size_ > N)
@@ -50,9 +50,17 @@ private:
     ++member_size_;
   }
 
+  T& operator[](aligned_size_t position)
+  /**
+   * Random access for use within public interface functions.
+   * @param position Position at which to randomly access object of type T.
+   * @return Reference to object of type T.
+   */
+  {
+    return *reinterpret_cast<T*>(data_ + position);
+  }
 
-
-  aligned_storage_t data_[N];
+  aligned_storage_t data_[N]; // contiguous storage for N objects of type T.
   aligned_size_t member_size_{0};
   aligned_size_t read_{0};
   aligned_size_t write_{0};
