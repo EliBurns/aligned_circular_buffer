@@ -20,7 +20,8 @@ class aligned_circular_buffer
  */
 {
   using aligned_size_t = std::uint64_t;
-  using aligned_storage_t = std::aligned_storage<sizeof(T), alignof(T)>::type;
+  using aligned_storage_t =
+    typename std::aligned_storage<sizeof(T), alignof(T)>::type;
 
 public:
 
@@ -46,6 +47,9 @@ public:
       reinterpret_cast<T*>(data_ + position)->~T();
   }
 
+  /*
+   * Prevent buffer from being copied or moved after being constructed.
+   */
   aligned_circular_buffer(aligned_circular_buffer&) = delete;
   aligned_circular_buffer& operator=(aligned_circular_buffer&) = delete;
   aligned_circular_buffer(aligned_circular_buffer&&) = delete;
