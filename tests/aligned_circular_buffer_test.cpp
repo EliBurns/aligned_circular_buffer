@@ -72,5 +72,17 @@ TEST_CASE("test full() and clear()", "[full_clear]")
 {
   aligned_circular_buffer<test_message, test_buffer_size> test_buffer;
 
+  unsigned n_messages = test_buffer_size;
+  for (unsigned i = 0; i < test_buffer_size; ++i)
+  {
+    test_message msg;
+    msg.field_0 = i;
+    test_buffer.push_back(msg);
+    REQUIRE(test_buffer.size() == i + 1);
+  }
+  REQUIRE(test_buffer.full());
 
+  test_buffer.clear();
+  REQUIRE_FALSE(test_buffer.full());
+  REQUIRE(test_buffer.empty());
 }
