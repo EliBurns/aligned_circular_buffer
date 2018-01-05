@@ -46,6 +46,12 @@ public:
       reinterpret_cast<T*>(data_ + position)->~T();
   }
 
+  aligned_circular_buffer(aligned_circular_buffer&) = delete;
+  aligned_circular_buffer& operator=(aligned_circular_buffer&) = delete;
+  aligned_circular_buffer(aligned_circular_buffer&&) = delete;
+  aligned_circular_buffer& operator=(aligned_circular_buffer&&) = delete;
+
+
 
 private:
   void emplace_back(T element)
