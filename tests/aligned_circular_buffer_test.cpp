@@ -40,3 +40,37 @@ TEST_CASE("verify initial values are correct after construction",
   REQUIRE(test_buffer.empty());
   REQUIRE_FALSE(test_buffer.full());
 }
+
+TEST_CASE("test push_back and pop_front", "[push_pop]")
+{
+  aligned_circular_buffer<test_message, test_buffer_size> test_buffer;
+
+  /*
+   * Push a number of test messages onto the test buffer and then pop messages
+   * and confirm they're correct.
+   */
+  unsigned n_messages = 7;
+  for (unsigned i = 0; i < n_messages; ++i)
+  {
+    test_message msg;
+    msg.field_0 = i;
+    test_buffer.push_back(msg);
+    REQUIRE(test_buffer.size() == i + 1);
+  }
+
+  for (unsigned i = 0; i < n_messages; ++i)
+  {
+    REQUIRE(test_buffer.size() == n_messages - i);
+    auto msg = test_buffer.pop_front();
+    REQUIRE(msg.field_0 == i);
+  }
+  REQUIRE(test_buffer.empty());
+  REQUIRE_FALSE(test_buffer.full());
+}
+
+TEST_CASE("test full() and clear()", "[full_clear]")
+{
+  aligned_circular_buffer<test_message, test_buffer_size> test_buffer;
+
+
+}
