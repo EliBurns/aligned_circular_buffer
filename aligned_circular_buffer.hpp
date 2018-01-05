@@ -51,6 +51,31 @@ public:
   aligned_circular_buffer(aligned_circular_buffer&&) = delete;
   aligned_circular_buffer& operator=(aligned_circular_buffer&&) = delete;
 
+  aligned_size_t capacity() const { return capacity_; }
+  void clear() { read_ = write_ = 0; }
+  aligned_size_t size() const { return write_ - read_; }
+  bool empty() const { return read_ == write_; }
+  bool full() const { return size() == capacity_; }
+
+  T pop_front()
+  /**
+   * Advance read iterator and return object at masked position.
+   * @return Object of type T.
+   */
+  {
+    return operator[](mask(++read_));
+  }
+
+  void push_back(T element)
+  /**
+   *
+   * @param element
+   */
+  {
+    if (full())
+      ++read_;
+    operator[](mask(++write_)) = element;
+  }
 
 
 private:
