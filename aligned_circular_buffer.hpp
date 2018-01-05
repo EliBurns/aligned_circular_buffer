@@ -71,6 +71,16 @@ private:
     return *reinterpret_cast<T*>(data_ + position);
   }
 
+  const aligned_size_t mask(aligned_size_t value) const
+  /**
+   * Masks the value to index within the capacity of the aligned contiguous data.
+   * @param value Value to mask.
+   * @return Masked value.
+   */
+  {
+    return (value & (capacity_ - 1));
+  }
+
   aligned_storage_t data_[N]; // contiguous storage for N objects of type T.
   aligned_size_t member_size_;
   aligned_size_t read_;
