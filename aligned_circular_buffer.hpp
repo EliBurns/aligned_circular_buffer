@@ -27,8 +27,8 @@ public:
   aligned_circular_buffer()
   /**
    * Default constructor ~ asserts that buffer size is equal to a power of two
-   * at compile time. Fills contiguous memory with default constructed members
-   * of type T.
+   * at compile time. Initializes contiguous memory with default constructed
+   * members of type T.
    */
     : member_size_{0}, read_{0}, write_{0}, capacity_{N}
   {
@@ -66,10 +66,11 @@ public:
     return operator[](mask(++read_));
   }
 
-  void push_back(T element)
+  void push_back(const T& element)
   /**
-   *
-   * @param element
+   * Takes element, checks if the circular array buffer is full and then
+   * adjusts read iterator if necessary before placing object in buffer.
+   * @param element Object of type T.
    */
   {
     if (full())
