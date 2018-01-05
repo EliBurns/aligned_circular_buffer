@@ -30,11 +30,22 @@ public:
    * at compile time. Fills contiguous memory with default constructed members
    * of type T.
    */
+    : member_size_{0}, read_{0}, write_{0}, capacity_{N}
   {
     assert((!(N & (N-1))) && N);
     while (member_size_ < N)
       emplace_back(T());
   }
+
+  ~aligned_circular_buffer()
+  /**
+   * Frees all objects of type T from contiguous memory locations.
+   */
+  {
+    for (std::size_t position = 0; position < capacity_; ++position)
+      reinterpret_cast<T*>(data_ + position)->~T();
+  }
+
 
 private:
   void emplace_back(T element)
@@ -61,10 +72,10 @@ private:
   }
 
   aligned_storage_t data_[N]; // contiguous storage for N objects of type T.
-  aligned_size_t member_size_{0};
-  aligned_size_t read_{0};
-  aligned_size_t write_{0};
-  aligned_size_t capacity_{N};
+  aligned_size_t member_size_;
+  aligned_size_t read_;
+  aligned_size_t write_;
+  aligned_size_t capacity_;
 };
 
 
