@@ -32,7 +32,7 @@ struct alignas(64) test_message
 };
 ```
 
-The above message, used with aligned circular buffer, can reduce cache
+The above message, used with an aligned circular buffer, can reduce cache
 eviction by accounting for the alignment of the size of a cache's blocks.
 (64 Bytes is quite common--you can be sure it will always be a power of two).
 
@@ -64,7 +64,7 @@ void consumer(aligned_circular_buffer& buffer)
 
 int main()
 {
-  aligned_circular_buffer<int> buffer;
+  aligned_circular_buffer<int, 16> buffer;
   std::thread producer_thread(producer, &buffer);
   std::thread consumer_thread(consumer, &buffer);
 
@@ -74,5 +74,17 @@ int main()
 
 ```
 
+The above program uses a producer that pushes a series of integers onto
+the aligned circular buffer. In a separate process, the consumer checks
+if there is a new message to inspect and pops it from the buffer and
+prints it to standard output if so. If the aligned circular buffer were
+smaller, say size 4, and the consumer were not quick enough in its checking
+and removing messages, the producer would overwrite the oldest messages
+in the buffer as new messages are produced.
+
+## Tests
+
+Unit tests are located in the test directory. There's a few demonstrating
+essential functionality, but more extensive tests may be added.
 
 
