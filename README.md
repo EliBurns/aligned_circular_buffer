@@ -74,6 +74,8 @@ int main()
 
   producer_thread.join();
   consumer_thread.join();
+
+  return 0;
 }
 
 ```
