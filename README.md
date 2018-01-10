@@ -48,7 +48,7 @@ void producer(aligned_circular_buffer& buffer)
   int x = 0;
   while (x < 10)
   {
-    std::this_thread::sleep_for (std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     buffer.push_back(x);
   }
 }
