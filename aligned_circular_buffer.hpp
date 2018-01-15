@@ -20,6 +20,9 @@ class aligned_circular_buffer
  * type T must have default constructor.
  */
 {
+  static_assert((!(N & (N-1))) && N,
+    "aligned_circular_buffer must of size power of two.");
+
   using aligned_size_t = std::uint64_t;
   using aligned_storage_t =
     typename std::aligned_storage<sizeof(T), alignof(T)>::type;
@@ -75,7 +78,6 @@ public:
    */
     : member_size_{0}, read_{0}, write_{0}, capacity_{N}
   {
-    assert((!(N & (N-1))) && N);
     while (member_size_ < N)
       emplace_back(T());
   }
@@ -97,11 +99,11 @@ public:
   aligned_circular_buffer(aligned_circular_buffer&&) = delete;
   aligned_circular_buffer& operator=(aligned_circular_buffer&&) = delete;
 
-  aligned_size_t capacity() const { return capacity_; }
-  void clear() { read_ = write_ = 0; }
-  aligned_size_t size() const { return write_ - read_; }
+  std::size_t capacity() const { return capacity_; }
+  std::size_t size() const { return write_ - read_; }
   bool empty() const { return read_ == write_; }
   bool full() const { return size() == capacity_; }
+  void clear() { read_ = write_ = 0; }
 
   T pop_front()
   /**
