@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstdint>
 #include <new>
+#include <atomic>
 
 
 template <class T, std::size_t N>
@@ -22,6 +23,47 @@ class aligned_circular_buffer
   using aligned_size_t = std::uint64_t;
   using aligned_storage_t =
     typename std::aligned_storage<sizeof(T), alignof(T)>::type;
+
+private:
+  aligned_storage_t data_[N]; // contiguous storage for N objects of type T.
+  std::atomic<aligned_size_t> member_size_;
+  std::atomic<aligned_size_t> read_;
+  std::atomic<aligned_size_t> write_;
+  std::atomic<aligned_size_t> capacity_;
+
+
+  void emplace_back(T element)
+  /**
+   * Create an object within aligned storage.
+   * @param element Element to store of type T.
+   */
+  {
+    if (member_size_ > N)
+      throw std::bad_alloc{};
+
+    new(data_ + member_size_) T(element);
+    ++member_size_;
+  }
+
+  T& operator[](aligned_size_t position)
+  /**
+   * Random access for use within public interface functions.
+   * @param position Position at which to randomly access object of type T.
+   * @return Reference to object of type T.
+   */
+  {
+    return *reinterpret_cast<T*>(data_ + position);
+  }
+
+  const aligned_size_t mask(aligned_size_t value) const
+  /**
+   * Masks the value to index within the capacity of the aligned contiguous data.
+   * @param value Value to mask.
+   * @return Masked value.
+   */
+  {
+    return (value & (capacity_ - 1));
+  }
 
 public:
 
@@ -81,47 +123,6 @@ public:
       ++read_;
     operator[](mask(++write_)) = element;
   }
-
-
-private:
-  void emplace_back(T element)
-  /**
-   * Create an object within aligned storage.
-   * @param element Element to store of type T.
-   */
-  {
-    if (member_size_ > N)
-      throw std::bad_alloc{};
-
-    new(data_ + member_size_) T(element);
-    ++member_size_;
-  }
-
-  T& operator[](aligned_size_t position)
-  /**
-   * Random access for use within public interface functions.
-   * @param position Position at which to randomly access object of type T.
-   * @return Reference to object of type T.
-   */
-  {
-    return *reinterpret_cast<T*>(data_ + position);
-  }
-
-  const aligned_size_t mask(aligned_size_t value) const
-  /**
-   * Masks the value to index within the capacity of the aligned contiguous data.
-   * @param value Value to mask.
-   * @return Masked value.
-   */
-  {
-    return (value & (capacity_ - 1));
-  }
-
-  aligned_storage_t data_[N]; // contiguous storage for N objects of type T.
-  aligned_size_t member_size_;
-  aligned_size_t read_;
-  aligned_size_t write_;
-  aligned_size_t capacity_;
 };
 
 
